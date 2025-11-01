@@ -13,7 +13,7 @@ A Flask-based web application that allows users to input text and displays the s
 
 ## Prerequisites
 
-- Python 3.11 or higher
+- Python 3.13 or higher
 - Docker (for containerized deployment)
 
 ## Running Locally
