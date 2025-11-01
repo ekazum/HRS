@@ -3,6 +3,7 @@ import re
 from flask import Flask, render_template, request
 from openai import OpenAI
 from dotenv import load_dotenv
+from typing import  Iterable, Any, cast
 
 load_dotenv()
 
@@ -89,13 +90,16 @@ Please provide:
 
 Keep the response clear, concise, and easy to understand."""
 
+        messages = [
+            {"role": "system",
+             "content": "You are a helpful medical assistant who provides general health information and recommendations. Always remind users to consult healthcare professionals for proper diagnosis and treatment."},
+            {"role": "user", "content": prompt}
+        ]
+        messages_typed = cast(Iterable[Any], messages)
         # Call OpenAI API
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful medical assistant who provides general health information and recommendations. Always remind users to consult healthcare professionals for proper diagnosis and treatment."},
-                {"role": "user", "content": prompt}
-            ],
+            messages=messages_typed,
             temperature=0.7,
             max_tokens=500
         )
