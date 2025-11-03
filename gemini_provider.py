@@ -5,6 +5,7 @@ This module defines the Google Gemini LLM provider implementation.
 """
 
 import os
+import google.generativeai as genai
 from llm_provider import LLMProvider
 from llm_constants import (
     DEMO_MODE_RESPONSE,
@@ -28,7 +29,6 @@ class GeminiProvider(LLMProvider):
             return False
         
         try:
-            import google.generativeai as genai
             genai.configure(api_key=self.api_key)
             # Use environment variable for model if provided, otherwise use default
             model_name = os.getenv('GEMINI_MODEL', self.DEFAULT_MODEL)
@@ -41,20 +41,25 @@ class GeminiProvider(LLMProvider):
     def generate_response(self, prompt: str, system_message: str) -> str:
         """Generate a response using Google Gemini."""
         if not self.is_available():
-            return self._demo_response(prompt)
+            return self._demo_response()
         
         try:
             # Combine system message and prompt for Gemini
             full_prompt = f"{system_message}\n\n{prompt}"
-            
+
+            # file: gemini_provider.py
+            from typing import Any, cast
+
+            gen_config = cast(Any, {
+                'temperature': 0.7,
+                'max_output_tokens': 4096,
+            })
+
             response = self._client.generate_content(
                 full_prompt,
-                generation_config={
-                    'temperature': 0.7,
-                    'max_output_tokens': 500,
-                }
+                generation_config=gen_config
             )
-            
+
             # Check for blocked or filtered responses
             if response.candidates:
                 candidate = response.candidates[0]
@@ -84,6 +89,6 @@ class GeminiProvider(LLMProvider):
             print(ERROR_GENERATION_TEMPLATE.format(provider_name=self.PROVIDER_NAME, error=str(e)))
             return ERROR_RESPONSE_TEMPLATE.format(provider_name=self.PROVIDER_NAME)
     
-    def _demo_response(self, prompt: str) -> str:
+    def _demo_response(self) -> str:
         """Return a demo response when API key is not configured."""
         return DEMO_MODE_RESPONSE.format(provider_name=self.PROVIDER_NAME)

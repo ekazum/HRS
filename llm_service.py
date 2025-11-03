@@ -36,15 +36,15 @@ def get_provider(provider_name: str = None) -> LLMProvider:
     
     if provider_name == 'openai':
         api_key = os.getenv('OPENAI_API_KEY')
-        provider = OpenAIProvider(api_key)
+        llm_provider = OpenAIProvider(api_key)
     elif provider_name == 'gemini':
         api_key = os.getenv('GEMINI_API_KEY')
-        provider = GeminiProvider(api_key)
+        llm_provider = GeminiProvider(api_key)
     else:
         raise ValueError(f"Unknown provider: {provider_name}. Supported providers: openai, gemini")
     
-    provider.initialize()
-    return provider
+    llm_provider.initialize()
+    return llm_provider
 
 
 # Initialize LLM provider (defaults to Gemini)
@@ -80,7 +80,7 @@ def get_health_recommendation(symptoms, duration, severity, additional_info):
     severity = validate_severity(severity)
     
     # Construct the prompt
-    prompt = f"""You are a helpful medical assistant. Based on the following patient information, provide general health recommendations and suggestions. Remember to always advise consulting a healthcare professional.
+    prompt = f"""You are a helpful medical assistant. Based on the following patient information, provide best next medical test to diagnose, also suggest diagnosis.
 
 Symptoms: {symptoms}
 Duration: {duration}
@@ -96,7 +96,7 @@ Please provide:
 
 Keep the response clear, concise, and easy to understand."""
 
-    system_message = "You are a helpful medical assistant who provides general health information and recommendations. Always remind users to consult healthcare professionals for proper diagnosis and treatment."
+    system_message = "You are a helpful medical assistant who provides general health information and recommendations."
     
     # Get response from provider
     return provider.generate_response(prompt, system_message)

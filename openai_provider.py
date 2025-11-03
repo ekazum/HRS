@@ -37,7 +37,7 @@ class OpenAIProvider(LLMProvider):
     def generate_response(self, prompt: str, system_message: str) -> str:
         """Generate a response using OpenAI GPT."""
         if not self.is_available():
-            return self._demo_response(prompt)
+            return self._demo_response()
         
         try:
             from typing import Iterable, Any, cast
@@ -64,6 +64,6 @@ class OpenAIProvider(LLMProvider):
             print(ERROR_GENERATION_TEMPLATE.format(provider_name=self.PROVIDER_NAME, error=str(e)))
             return ERROR_RESPONSE_TEMPLATE.format(provider_name=self.PROVIDER_NAME)
     
-    def _demo_response(self, prompt: str) -> str:
+    def _demo_response(self) -> str:
         """Return a demo response when API key is not configured."""
         return DEMO_MODE_RESPONSE.format(provider_name=self.PROVIDER_NAME)
