@@ -16,6 +16,7 @@ from .llm_provider import LLMProvider
 from .openai_provider import OpenAIProvider
 from .gemini_provider import GeminiProvider
 from RAG.rag_service import get_rag_service
+from Agent.consultation_agent import get_consultation_agent
 
 load_dotenv()
 
@@ -55,6 +56,9 @@ provider = get_provider()
 # Initialize RAG service if enabled
 rag_service = get_rag_service()
 
+# Initialize consultation agent
+consultation_agent = get_consultation_agent()
+
 
 def sanitize_input(text, max_length=1000):
     """Sanitize user input to prevent injection attacks."""
@@ -77,12 +81,28 @@ def validate_severity(severity):
 
 
 def get_health_recommendation(symptoms, duration, severity, additional_info):
-    """Get health recommendations from the configured LLM provider with RAG enhancement."""
+    """Get health recommendations from the configured LLM provider with RAG enhancement and consultation agent."""
     # Sanitize all inputs
     symptoms = sanitize_input(symptoms, 500)
     duration = sanitize_input(duration, 100)
     additional_info = sanitize_input(additional_info, 500)
     severity = validate_severity(severity)
+    
+    # Consult the medical agent for initial diagnostic guidance
+    agent_consultation = consultation_agent.consult(symptoms, duration, severity, additional_info)
+    
+    # Format agent consultation results for inclusion in prompt
+    agent_guidance = f"""
+Medical Consultation Agent Analysis:
+
+Urgency Level: {agent_consultation['urgency_level'].upper()}
+
+Possible Diagnoses to Consider:
+{chr(10).join(f"- {diag}" for diag in agent_consultation['diagnosis_suggestions'])}
+
+Recommended Diagnostic Tests:
+{chr(10).join(f"- {test}" for test in agent_consultation['recommended_tests'])}
+"""
     
     # Construct the base prompt
     prompt = f"""You are a helpful medical assistant. Based on the following patient information, provide best next medical test to diagnose, also suggest diagnosis.
@@ -92,7 +112,9 @@ Duration: {duration}
 Severity: {severity}/10
 Additional Information: {additional_info if additional_info else 'None provided'}
 
-Please provide:
+{agent_guidance}
+
+Based on the patient information and the medical consultation agent's analysis above, please provide:
 1. A brief assessment of the symptoms
 2. Possible causes (general information only)
 3. Self-care recommendations

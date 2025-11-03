@@ -5,8 +5,9 @@ A Flask-based web application that provides AI-powered health recommendations ba
 
 ## Features
 
-- Clean and responsive web interface
+- Clean and responsive web interface with wider screens
 - Patient symptoms input form with multiple fields (symptoms, duration, severity, additional info)
+- **Medical Consultation Agent**: Intelligent agent providing diagnostic suggestions and test recommendations before LLM consultation
 - **RAG (Retrieval-Augmented Generation)**: Enhanced recommendations using a medical knowledge base
 - **Multiple LLM provider support**: Choose between Google Gemini (default) or OpenAI GPT
 - Flexible provider configuration through environment variables
@@ -81,6 +82,9 @@ docker rm hrs
 ```
 HRS/
 ├── app.py                  # Flask web application (routes and web logic)
+├── Agent/                  # Medical consultation agent module
+│   ├── __init__.py         # Agent module initialization and exports
+│   └── consultation_agent.py # Consultation agent base class and implementations
 ├── LLM/                    # LLM module containing all LLM-related functionality
 │   ├── __init__.py         # Module initialization and exports
 │   ├── llm_service.py     # LLM service module (provider factory, integration, prompts)
@@ -93,13 +97,14 @@ HRS/
 │   ├── rag_service.py     # RAG service for document retrieval and context augmentation
 │   └── medical_knowledge.py # Medical knowledge base for RAG
 ├── templates/
-│   ├── index.html         # Patient symptoms input form
-│   └── output.html        # AI recommendations display page
+│   ├── index.html         # Patient symptoms input form (wider layout)
+│   └── output.html        # AI recommendations display page (wider layout)
 ├── tests/                 # Unit tests
 │   ├── __init__.py        # Tests module initialization
 │   ├── test_llm_service.py # Unit tests for LLM service
 │   ├── test_rag_service.py # Unit tests for RAG service
-│   └── test_medical_knowledge.py # Unit tests for medical knowledge base
+│   ├── test_medical_knowledge.py # Unit tests for medical knowledge base
+│   └── test_consultation_agent.py # Unit tests for consultation agent
 ├── requirements.txt       # Python dependencies
 ├── .env.example          # Environment variables template
 ├── Dockerfile            # Docker configuration
@@ -147,6 +152,45 @@ The application supports multiple LLM providers with easy configuration:
 ### Demo Mode
 
 If no API key is configured, the application runs in demo mode, showing example responses instead of real AI-generated recommendations.
+
+## Medical Consultation Agent
+
+The application includes a Medical Consultation Agent that provides initial diagnostic guidance before consulting the LLM. This agent analyzes patient symptoms and provides:
+
+- **Diagnosis Suggestions**: Possible conditions to consider based on symptom severity
+- **Recommended Tests**: Diagnostic tests that may be helpful
+- **Urgency Level**: Assessment of urgency (low, medium, high)
+
+### How the Agent Works
+
+1. **Pre-LLM Analysis**: Before sending the query to the LLM, the consultation agent analyzes the patient's symptoms, duration, severity, and additional information
+2. **Structured Guidance**: The agent provides structured medical guidance including possible diagnoses and recommended diagnostic tests
+3. **LLM Integration**: The agent's analysis is included in the prompt sent to the LLM, allowing the AI to provide more informed recommendations
+
+### Agent Configuration
+
+The consultation agent can be configured via environment variables:
+
+```bash
+# Agent type (default: dummy)
+# Current options: 'dummy' (demonstration agent)
+# Future: Additional agent implementations can be added
+CONSULTATION_AGENT_TYPE=dummy
+```
+
+### Implementation Details
+
+- **Base Interface**: `ConsultationAgent` abstract base class defines the agent interface
+- **Dummy Implementation**: `DummyConsultationAgent` provides a working demonstration that bases recommendations on symptom severity
+- **Extensible Design**: The architecture allows for easy replacement with more sophisticated agents (e.g., ML-based agents, external API integrations)
+
+### Adding Custom Agents
+
+To add a custom consultation agent:
+
+1. Create a new class that inherits from `ConsultationAgent`
+2. Implement the `consult()` method
+3. Update `get_consultation_agent()` in `Agent/consultation_agent.py` to return your agent based on configuration
 
 ## RAG (Retrieval-Augmented Generation) Configuration
 
