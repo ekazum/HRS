@@ -3,7 +3,7 @@ Unit tests for RAG service module.
 """
 
 import unittest
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import Mock, patch, MagicMock
 import os
 from LLM.RAG.rag_service import RAGService, get_rag_service, RAG_PROMPT_TEMPLATE
 
