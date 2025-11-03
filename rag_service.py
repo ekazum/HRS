@@ -13,6 +13,19 @@ from typing import List, Optional
 from medical_knowledge import MEDICAL_DOCUMENTS
 
 
+# Prompt template for RAG-augmented queries
+RAG_PROMPT_TEMPLATE = """Use the following medical knowledge as reference to provide accurate recommendations:
+
+MEDICAL REFERENCE INFORMATION:
+{context}
+
+---
+
+{original_prompt}
+
+Please provide recommendations based on both the medical reference information above and your medical knowledge."""
+
+
 class RAGService:
     """Service for managing RAG operations."""
     
@@ -91,10 +104,13 @@ class RAGService:
                 return
             
             # Generate embeddings for all documents
+            # Note: This is done synchronously on first initialization
+            # The embeddings are cached in the persistent database for subsequent runs
+            print("Generating embeddings for medical knowledge base...")
             embeddings = self.embedding_model.encode(
                 MEDICAL_DOCUMENTS,
                 convert_to_numpy=True,
-                show_progress_bar=True
+                show_progress_bar=False  # Disable progress bar to avoid console clutter
             )
             
             # Add documents to collection
@@ -107,7 +123,7 @@ class RAGService:
             
             print(f"Indexed {len(MEDICAL_DOCUMENTS)} medical documents")
         except Exception as e:
-            print(f"Error indexing documents: {str(e)}")
+            print(f"Error indexing medical documents into vector store: {str(e)}")
             raise
     
     def retrieve_relevant_context(self, query: str, top_k: int = 3) -> str:
@@ -174,17 +190,11 @@ class RAGService:
             # If no context retrieved, return original prompt
             return original_prompt
         
-        # Augment prompt with context
-        augmented_prompt = f"""Use the following medical knowledge as reference to provide accurate recommendations:
-
-MEDICAL REFERENCE INFORMATION:
-{context}
-
----
-
-{original_prompt}
-
-Please provide recommendations based on both the medical reference information above and your medical knowledge."""
+        # Augment prompt with context using template
+        augmented_prompt = RAG_PROMPT_TEMPLATE.format(
+            context=context,
+            original_prompt=original_prompt
+        )
         
         return augmented_prompt
 
