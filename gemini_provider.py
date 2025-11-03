@@ -19,7 +19,7 @@ class GeminiProvider(LLMProvider):
     """Google Gemini LLM provider implementation."""
     
     # Model configuration as class constant
-    DEFAULT_MODEL = 'gemini-1.5-flash'
+    DEFAULT_MODEL = 'gemini-2.5-flash'
     PROVIDER_NAME = 'Gemini'
     
     def initialize(self) -> bool:

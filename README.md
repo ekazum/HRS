@@ -102,7 +102,7 @@ The application supports multiple LLM providers with easy configuration:
 ### Supported Providers
 
 1. **Google Gemini** (Default)
-   - Model: `gemini-1.5-flash`
+   - Model: `gemini-2.5-flash`
    - Configuration: Set `LLM_PROVIDER=gemini` (or omit, as it's the default)
    - API Key: `GEMINI_API_KEY`
 
