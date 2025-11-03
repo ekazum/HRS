@@ -5,8 +5,8 @@ This module defines the OpenAI LLM provider implementation.
 """
 
 import os
-from llm_provider import LLMProvider
-from llm_constants import (
+from .llm_provider import LLMProvider
+from .llm_constants import (
     DEMO_MODE_RESPONSE,
     ERROR_RESPONSE_TEMPLATE,
     ERROR_INIT_TEMPLATE,

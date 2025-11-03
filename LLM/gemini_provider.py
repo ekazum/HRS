@@ -6,8 +6,8 @@ This module defines the Google Gemini LLM provider implementation.
 
 import os
 import google.generativeai as genai
-from llm_provider import LLMProvider
-from llm_constants import (
+from .llm_provider import LLMProvider
+from .llm_constants import (
     DEMO_MODE_RESPONSE,
     ERROR_RESPONSE_TEMPLATE,
     ERROR_EMPTY_RESPONSE,

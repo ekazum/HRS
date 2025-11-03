@@ -81,13 +81,15 @@ docker rm hrs
 ```
 HRS/
 ├── app.py                  # Flask web application (routes and web logic)
-├── llm_service.py         # LLM service module (provider factory, integration, prompts, RAG)
-├── llm_provider.py        # Abstract base class for LLM providers
-├── openai_provider.py     # OpenAI provider implementation
-├── gemini_provider.py     # Google Gemini provider implementation
-├── llm_constants.py       # Shared constants and message templates
-├── rag_service.py         # RAG service for document retrieval and context augmentation
-├── medical_knowledge.py   # Medical knowledge base for RAG
+├── LLM/                    # LLM module containing all LLM-related functionality
+│   ├── __init__.py         # Module initialization and exports
+│   ├── llm_service.py     # LLM service module (provider factory, integration, prompts, RAG)
+│   ├── llm_provider.py    # Abstract base class for LLM providers
+│   ├── openai_provider.py # OpenAI provider implementation
+│   ├── gemini_provider.py # Google Gemini provider implementation
+│   ├── llm_constants.py   # Shared constants and message templates
+│   ├── rag_service.py     # RAG service for document retrieval and context augmentation
+│   └── medical_knowledge.py # Medical knowledge base for RAG
 ├── templates/
 │   ├── index.html         # Patient symptoms input form
 │   └── output.html        # AI recommendations display page
