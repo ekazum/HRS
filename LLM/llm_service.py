@@ -12,10 +12,10 @@ This module handles all interactions with LLM providers, including:
 import os
 import re
 from dotenv import load_dotenv
-from llm_provider import LLMProvider
-from openai_provider import OpenAIProvider
-from gemini_provider import GeminiProvider
-from rag_service import get_rag_service
+from .llm_provider import LLMProvider
+from .openai_provider import OpenAIProvider
+from .gemini_provider import GeminiProvider
+from .rag_service import get_rag_service
 
 load_dotenv()
 

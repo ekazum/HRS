@@ -10,7 +10,7 @@ import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from typing import List, Optional
-from medical_knowledge import MEDICAL_DOCUMENTS
+from .medical_knowledge import MEDICAL_DOCUMENTS
 
 
 # Prompt template for RAG-augmented queries
