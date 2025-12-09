@@ -5,7 +5,7 @@ pipeline:
   name: "mimic4_standard"
   output_dir: "./data/processed"
   # How many rows to read for testing? (Set to null for all rows)
-  max_rows: 50000
+  max_rows: 100000
 
 # Data Source 1: MIMIC-IV
 mimic4:
