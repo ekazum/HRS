@@ -20,12 +20,45 @@ A Flask-based web application that provides AI-powered health recommendations ba
 ## Prerequisites
 
 - Python 3.13 or higher
+- Conda (recommended) or pip for package management
+  - **Conda**: Install from https://docs.conda.io/en/latest/miniconda.html
+  - **pip**: Comes with Python
 - An API key from one of the supported providers:
   - **Gemini API key** (recommended, default provider): Get from https://makersuite.google.com/app/apikey
   - **OpenAI API key** (optional): Get from https://platform.openai.com/api-keys
 - Docker (for containerized deployment)
 
 ## Running Locally
+
+### Using Conda (Recommended)
+
+1. Create and activate the conda environment:
+```bash
+conda env create -f environment.yml
+conda activate hrs
+```
+
+2. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env and configure your preferred LLM provider:
+# - Set LLM_PROVIDER to either 'gemini' (default) or 'openai'
+# - Add the corresponding API key (GEMINI_API_KEY or OPENAI_API_KEY)
+```
+
+3. Run with Flask development server:
+```bash
+python app.py
+```
+
+4. Run with Gunicorn (Linux only):
+```bash
+gunicorn --bind 0.0.0.0:5000 app:app
+```
+
+5. Open your browser and navigate to `http://localhost:5000`
+
+### Using pip
 
 1. Install dependencies:
 ```bash
@@ -53,6 +86,32 @@ gunicorn --bind 0.0.0.0:5000 app:app
 5. Open your browser and navigate to `http://localhost:5000`
 
 ## Running with Docker
+
+### Using Conda-based Docker Image (Recommended)
+
+1. Build the Docker image:
+```bash
+docker build -f Dockerfile.conda -t hrs-flask-app .
+```
+
+2. Run the container with your LLM provider configuration:
+```bash
+# Using Gemini (default)
+docker run -d -p 8080:5000 -e GEMINI_API_KEY=your_api_key_here --name hrs hrs-flask-app
+
+# Or using OpenAI
+docker run -d -p 8080:5000 -e LLM_PROVIDER=openai -e OPENAI_API_KEY=your_api_key_here --name hrs hrs-flask-app
+```
+
+3. Open your browser and navigate to `http://localhost:8080`
+
+4. Stop the container:
+```bash
+docker stop hrs
+docker rm hrs
+```
+
+### Using pip-based Docker Image
 
 1. Build the Docker image:
 ```bash
@@ -100,9 +159,11 @@ HRS/
 │   ├── test_llm_service.py # Unit tests for LLM service
 │   ├── test_rag_service.py # Unit tests for RAG service
 │   └── test_medical_knowledge.py # Unit tests for medical knowledge base
-├── requirements.txt       # Python dependencies
+├── requirements.txt       # Python dependencies (pip)
+├── environment.yml        # Conda environment specification
 ├── .env.example          # Environment variables template
-├── Dockerfile            # Docker configuration
+├── Dockerfile            # Docker configuration (pip-based)
+├── Dockerfile.conda      # Docker configuration (conda-based)
 ├── .dockerignore        # Docker ignore file
 ├── .gitignore           # Git ignore file
 └── README.md            # This file
