@@ -20,12 +20,45 @@ A Flask-based web application that provides AI-powered health recommendations ba
 ## Prerequisites
 
 - Python 3.13 or higher
+- Conda (recommended) or pip for package management
+  - **Conda**: Install from https://docs.conda.io/en/latest/miniconda.html
+  - **pip**: Comes with Python
 - An API key from one of the supported providers:
   - **Gemini API key** (recommended, default provider): Get from https://makersuite.google.com/app/apikey
   - **OpenAI API key** (optional): Get from https://platform.openai.com/api-keys
 - Docker (for containerized deployment)
 
 ## Running Locally
+
+### Using Conda (Recommended)
+
+1. Create and activate the conda environment:
+```bash
+conda env create -f environment.yml
+conda activate hrs
+```
+
+2. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env and configure your preferred LLM provider:
+# - Set LLM_PROVIDER to either 'gemini' (default) or 'openai'
+# - Add the corresponding API key (GEMINI_API_KEY or OPENAI_API_KEY)
+```
+
+3. Run with Flask development server:
+```bash
+python app.py
+```
+
+4. Run with Gunicorn (Linux only):
+```bash
+gunicorn --bind 0.0.0.0:5000 app:app
+```
+
+5. Open your browser and navigate to `http://localhost:5000`
+
+### Using pip
 
 1. Install dependencies:
 ```bash
@@ -100,7 +133,8 @@ HRS/
 │   ├── test_llm_service.py # Unit tests for LLM service
 │   ├── test_rag_service.py # Unit tests for RAG service
 │   └── test_medical_knowledge.py # Unit tests for medical knowledge base
-├── requirements.txt       # Python dependencies
+├── requirements.txt       # Python dependencies (pip)
+├── environment.yml        # Conda environment specification
 ├── .env.example          # Environment variables template
 ├── Dockerfile            # Docker configuration
 ├── .dockerignore        # Docker ignore file
