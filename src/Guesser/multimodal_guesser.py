@@ -4,12 +4,12 @@ import torch.nn.functional as F
 import torch
 import torch.nn as nn
 from PIL import Image
-from .. import utils
+from ..common import utils
 import pandas as pd
 from transformers import AutoModel, AutoTokenizer, \
     BartForConditionalGeneration, BartTokenizer
-from image_embedder import ImageEmbedder
-from lstm_encoder import LSTMEncoder
+from .image_embedder import ImageEmbedder
+from .lstm_encoder import LSTMEncoder
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
