@@ -418,9 +418,6 @@ def test(model, X_test, y_test):
                 ) from e
             else:
                 raise
-    
-    # Reset model to eval mode after test
-    model.eval()
 
     correct = 0
     y_true = []
