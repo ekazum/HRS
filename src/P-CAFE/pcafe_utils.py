@@ -1,10 +1,7 @@
 import os
-from sklearn.datasets import fetch_openml
-from pathlib import Path
-from PIL import Image
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+from collections import Counter
 
 
 
@@ -60,7 +57,7 @@ def map_multiple_features(sample):
     return index_map
 
 
-def map_multiple_features_for_logistic_mimic(sample):
+def map_multiple_features_for_logistic_mimic():
     # map the index features that each test reveals
     index_map = {}
     for i in range(0, 17):
@@ -90,12 +87,6 @@ def load_mimic_time_series():
     # Get the current working directory
     base_dir = os.getcwd()
     # Construct file paths dynamically
-    #train_X_path = os.path.join(base_dir, 'input\\data_time_series\\train_X.csv')
-    #train_Y_path = os.path.join(base_dir, 'input\\data_time_series\\train_Y.csv')
-    #val_X_path = os.path.join(base_dir, 'input\\data_time_series\\val_X.csv')
-    #val_Y_path = os.path.join(base_dir, 'input\\data_time_series\\val_Y.csv')
-    #test_X_path = os.path.join(base_dir, 'input\\data_time_series\\test_X.csv')
-    #test_Y_path = os.path.join(base_dir, 'input\\data_time_series\\test_Y.csv')
     train_X_path = os.path.join(base_dir, 'data\\input\\data_time_series\\train_X.csv')
     train_Y_path = os.path.join(base_dir, 'data\\input\\data_time_series\\train_Y.csv')
     val_X_path = os.path.join(base_dir, 'data\\input\\data_time_series\\val_X.csv')
@@ -117,7 +108,7 @@ def load_mimic_time_series():
     # balance classes no noise
     X, Y = balance_class_no_noise(X.to_numpy(), Y)
     X = pd.DataFrame(X)
-    map_test = map_multiple_features_for_logistic_mimic(X.iloc[0])
+    map_test = map_multiple_features_for_logistic_mimic()
     return X, Y, 17, map_test
 
 
@@ -219,12 +210,9 @@ def balance_class_no_noise_dfs(patients, labels):
     - patients_balanced: List of balanced DataFrames.
     - labels_balanced: Balanced label list.
     """
-    from collections import Counter
-    import numpy as np
 
     # Count class instances
     class_counts = Counter(labels)
-    unique_classes = list(class_counts.keys())
     majority_class = max(class_counts, key=class_counts.get)
     minority_class = min(class_counts, key=class_counts.get)
 

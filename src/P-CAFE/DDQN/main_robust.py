@@ -1,7 +1,6 @@
 import shutil
 import torch.nn
 from typing import List, Tuple
-from matplotlib import pyplot as plt
 from env_robust import *
 from agent import *
 from PrioritiziedReplayMemory import *
