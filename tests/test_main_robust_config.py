@@ -160,20 +160,31 @@ class TestMainRobustStructure(unittest.TestCase):
     
     def test_functions_receive_specific_parameters(self):
         """Test that key functions receive specific parameters instead of using FLAGS."""
-        # Check train_helper
+        # Check train_helper - should have gamma but not device
         self.assertRegex(self.content, 
-                        r'def train_helper\([^)]*gamma[^)]*device[^)]*\)',
-                        "train_helper should accept gamma and device as parameters")
+                        r'def train_helper\([^)]*gamma[^)]*\)',
+                        "train_helper should accept gamma as parameter")
         
-        # Check play_episode
+        # Check play_episode - should have gamma but not device
         self.assertRegex(self.content,
-                        r'def play_episode\([^)]*gamma[^)]*device[^)]*\)',
-                        "play_episode should accept gamma and device as parameters")
+                        r'def play_episode\([^)]*gamma[^)]*\)',
+                        "play_episode should accept gamma as parameter")
         
-        # Check save_networks
+        # Check save_networks - should have save_dir but not device
         self.assertRegex(self.content,
-                        r'def save_networks\([^)]*save_dir[^)]*device[^)]*\)',
-                        "save_networks should accept save_dir and device as parameters")
+                        r'def save_networks\([^)]*save_dir[^)]*\)',
+                        "save_networks should accept save_dir as parameter")
+    
+    def test_has_device_global_constant(self):
+        """Test that DEVICE is defined as a global constant."""
+        self.assertIn('DEVICE = torch.device(', self.content,
+                     "DEVICE should be defined as a module-level constant")
+        
+        # Make sure it's defined before parse_arguments (i.e., at module level)
+        device_pos = self.content.find('DEVICE = torch.device(')
+        parse_args_pos = self.content.find('def parse_arguments():')
+        self.assertLess(device_pos, parse_args_pos,
+                       "DEVICE should be defined before parse_arguments function")
 
 
 if __name__ == '__main__':

@@ -32,6 +32,9 @@ DEFAULT_VAL_INTERVAL = 100
 DEFAULT_VAL_TRIALS_WO_IM = 5
 DEFAULT_COST_BUDGET = 17
 
+# Set device
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 
 def parse_arguments():
     """
@@ -135,8 +138,7 @@ def parse_arguments():
 
 def train_helper(agent: Agent,
                  minibatch: List[Transition],
-                 gamma: float,
-                 device) -> float:
+                 gamma: float) -> float:
     """Prepare minibatch and train them
     Args:
         agent (Agent): Agent has `train(Q_pred, Q_true)` method
@@ -157,7 +159,7 @@ def train_helper(agent: Agent,
     max_actions = np.argmax(agent.get_Q(next_states).cpu().data.numpy(), axis=1)
     Q_target[np.arange(len(Q_target)), actions] = rewards + gamma * agent.get_target_Q(next_states)[
         np.arange(len(Q_target)), max_actions].data.numpy() * ~done
-    Q_target = agent._to_variable(Q_target).to(device=device)
+    Q_target = agent._to_variable(Q_target).to(device=DEVICE)
     return agent.train(Q_predict, Q_target)
 
 
@@ -195,7 +197,6 @@ def play_episode(env,
                  eps: float,
                  batch_size: int,
                  gamma: float,
-                 device,
                  train_guesser=True,
                  train_dqn=True, mode='training') -> int:
     """Play an epsiode and train
@@ -233,7 +234,7 @@ def play_episode(env,
                     td_error = calculate_td_error(state, action, reward, next_state, done, agent, gamma)
                     td_errors.append(td_error)
                 priorityRM.update_priorities(indices, td_errors)
-                train_helper(agent, minibatch, gamma, device)
+                train_helper(agent, minibatch, gamma)
                 agent.update_learning_rate()
 
         t += 1
@@ -277,7 +278,6 @@ def epsilon_annealing(initial_epsilon, min_epsilon, anneal_steps, current_step):
 
 def save_networks(i_episode: int, env, agent,
                   save_dir: str,
-                  device,
                   val_acc=None) -> None:
     """ A method to save parameters of guesser and dqn """
     if not os.path.exists(save_dir):
@@ -297,18 +297,18 @@ def save_networks(i_episode: int, env, agent,
     if os.path.exists(guesser_save_path):
         os.remove(guesser_save_path)
     torch.save(env.guesser.cpu().state_dict(), guesser_save_path + '~')
-    env.guesser.to(device=device)
+    env.guesser.to(device=DEVICE)
     os.rename(guesser_save_path + '~', guesser_save_path)
 
     # save dqn
     if os.path.exists(dqn_save_path):
         os.remove(dqn_save_path)
     torch.save(agent.dqn.cpu().state_dict(), dqn_save_path + '~')
-    agent.dqn.to(device=device)
+    agent.dqn.to(device=DEVICE)
     os.rename(dqn_save_path + '~', dqn_save_path)
 
 
-def load_networks(i_episode: int, save_dir: str, device, state_dim=26, output_dim=14,
+def load_networks(i_episode: int, save_dir: str, state_dim=26, output_dim=14,
                   hidden_dim=64, val_acc=None) -> None:
     """ A method to load parameters of guesser and dqn """
     if i_episode == 'best':
@@ -344,22 +344,22 @@ def load_networks(i_episode: int, save_dir: str, device, state_dim=26, output_di
     guesser = MultimodalGuesser(flags_stub)
     guesser_state_dict = torch.load(guesser_load_path)
     guesser.load_state_dict(guesser_state_dict)
-    guesser.to(device=device)
+    guesser.to(device=DEVICE)
 
     # load sqn
     dqn = DQN(state_dim, output_dim, hidden_dim)
     dqn_state_dict = torch.load(dqn_load_path)
     dqn.load_state_dict(dqn_state_dict)
-    dqn.to(device=device)
+    dqn.to(device=DEVICE)
     return guesser, dqn
 
 
-def test(env, agent, state_dim, output_dim, save_dir, hidden_dim, device):
+def test(env, agent, state_dim, output_dim, save_dir, hidden_dim):
     total_steps = 0
     mask_list = []
     cost_list = []
     print('Loading best networks')
-    env.guesser, agent.dqn = load_networks(i_episode='best', save_dir=save_dir, device=device,
+    env.guesser, agent.dqn = load_networks(i_episode='best', save_dir=save_dir,
                                            state_dim=state_dim, output_dim=output_dim, hidden_dim=hidden_dim)
     y_hat_test = np.zeros(len(env.y_test))
     y_hat_probs = np.zeros(len(env.y_test))
@@ -443,7 +443,7 @@ def check_intersection_union(mask_list):
 
 
 def val(i_episode: int,
-        best_val_acc: float, env, agent, save_dir: str, device) -> float:
+        best_val_acc: float, env, agent, save_dir: str) -> float:
     """ Compute performance on validation set and save current models """
 
     print('Running validation')
@@ -504,8 +504,8 @@ def val(i_episode: int,
     print('Average cost: {:1.3f}'.format(avg_cost))
     if acc >= best_val_acc:
         print('New best acc acheievd, saving best model')
-        save_networks(i_episode, env, agent, save_dir, device, acc)
-        save_networks(i_episode='best', env=env, agent=agent, save_dir=save_dir, device=device)
+        save_networks(i_episode, env, agent, save_dir, acc)
+        save_networks(i_episode='best', env=env, agent=agent, save_dir=save_dir)
     return acc
 
 
@@ -518,22 +518,19 @@ def run(FLAGS):
     Returns:
         Tuple of (accuracy, iterations, intersection, union, steps)
     """
-    # set device
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
     if os.path.exists(FLAGS.save_dir):
         shutil.rmtree(FLAGS.save_dir)
 
     env = myEnv(flags=FLAGS,
-                device=device,cost_budget=FLAGS.cost_budget)
+                device=DEVICE,cost_budget=FLAGS.cost_budget)
     input_dim, output_dim = get_env_dim(env)
     state_dim= env.guesser.features_total
     agent = Agent(state_dim,
                   output_dim,
                   FLAGS.hidden_dim, FLAGS.lr, FLAGS.weight_decay)
 
-    agent.dqn.to(device=device)
-    env.guesser.to(device=device)
+    agent.dqn.to(device=DEVICE)
+    env.guesser.to(device=DEVICE)
     # store best result
     best_val_acc = 0
     val_list = []
@@ -556,7 +553,6 @@ def run(FLAGS):
                                  eps,
                                  FLAGS.batch_size,
                                  FLAGS.gamma,
-                                 device,
                                  train_dqn=train_dqn,
                                  train_guesser=train_guesser, mode='training')
         rewards_list.append(reward)
@@ -564,7 +560,7 @@ def run(FLAGS):
             # compute performance on validation set
             new_best_val_acc = val(i_episode=i,
                                    best_val_acc=best_val_acc, env=env, agent=agent,
-                                   save_dir=FLAGS.save_dir, device=device)
+                                   save_dir=FLAGS.save_dir)
             val_list.append(new_best_val_acc)
 
             # update best result on validation set and counter
@@ -579,7 +575,7 @@ def run(FLAGS):
         i += 1
 
     acc, intersect, unoin, steps = test(env, agent, state_dim, output_dim,
-                                        FLAGS.save_dir, FLAGS.hidden_dim, device)
+                                        FLAGS.save_dir, FLAGS.hidden_dim)
     # show_sample_paths(6, env, agent)
     return acc, i, intersect, unoin, steps
 
