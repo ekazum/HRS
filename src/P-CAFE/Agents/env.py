@@ -1,6 +1,5 @@
 import gymnasium
-from ..embedder_guesser import *
-from ..multimodal_guesser import MultimodalGuesser
+from ..Guesser.multimodal_guesser import MultimodalGuesser
 from gymnasium import spaces
 
 
