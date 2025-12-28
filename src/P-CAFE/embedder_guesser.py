@@ -4,7 +4,6 @@ import numpy as np
 import torch.nn.functional as F
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 from PIL import Image
 from sklearn.metrics import confusion_matrix, roc_auc_score, precision_recall_curve, auc
 from sklearn.model_selection import train_test_split
