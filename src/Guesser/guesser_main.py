@@ -371,8 +371,55 @@ def test(model, X_test, y_test):
     """
     guesser_filename = 'best_guesser.pth'
     guesser_load_path = os.path.join(model.path_to_save, guesser_filename)
+    
+    # Check if saved model exists
+    if not os.path.exists(guesser_load_path):
+        raise FileNotFoundError(
+            f"No saved model found at {guesser_load_path}. "
+            f"Please train the model first."
+        )
+    
     guesser_state_dict = torch.load(guesser_load_path)
-    model.load_state_dict(guesser_state_dict)
+    
+    # Verify that the saved model architecture matches the current model
+    try:
+        model.load_state_dict(guesser_state_dict, strict=True)
+    except RuntimeError as e:
+        if "size mismatch" in str(e):
+            raise RuntimeError(
+                f"The saved model architecture does not match the current model. "
+                f"This typically happens when the data structure or configuration has changed. "
+                f"Error details: {str(e)}\n\n"
+                f"To fix this issue:\n"
+                f"1. Delete the old saved model at: {guesser_load_path}\n"
+                f"2. Re-run training with the current data and configuration"
+            ) from e
+        else:
+            raise
+    
+    model.eval()
+    
+    # Additional validation: Check if a test sample can be processed
+    # This catches cases where the model loads but the forward pass dimensions don't match
+    if len(X_test) > 0:
+        try:
+            with torch.no_grad():
+                test_input = X_test[0]
+                _ = model(test_input)
+        except RuntimeError as e:
+            if "mat1 and mat2 shapes cannot be multiplied" in str(e) or "size mismatch" in str(e):
+                raise RuntimeError(
+                    f"The loaded model cannot process the test data due to dimension mismatch. "
+                    f"This indicates the model was trained on data with a different structure. "
+                    f"Error details: {str(e)}\n\n"
+                    f"To fix this issue:\n"
+                    f"1. Delete the old saved model at: {guesser_load_path}\n"
+                    f"2. Re-run the script to retrain the model with the current data"
+                ) from e
+            else:
+                raise
+    
+    # Reset model to eval mode after test
     model.eval()
 
     correct = 0
