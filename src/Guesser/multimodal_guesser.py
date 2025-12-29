@@ -122,7 +122,7 @@ class MultimodalGuesser(nn.Module):
         # load cost list
         self.cost_list = [1] * (self.tests_number + 1)
         if isinstance(self.X, list):
-            self.cost_list = [0] + [1] * (self.tests_number)
+            self.cost_list = [0] + [1] * self.tests_number
         self.cost_budget = sum(self.cost_list)
         # define image embedder
         self.img_embedder = ImageEmbedder()

@@ -1,4 +1,3 @@
-import os
 import random
 from argparse import Namespace
 
@@ -228,17 +227,17 @@ def train_model(model: MultimodalGuesser, FLAGS: Namespace,
         model.optimizer.zero_grad()  # Reset gradients before starting the batch
         # Process each sample in the batch
         for i in random_indices:
-            input = X_train[i]
+            sample = X_train[i]
             label = torch.tensor([y_train[i]], dtype=torch.long).to(model.device)  # Convert label to tensor
             prob_mask = compute_probabilities(j, nepochs)
             # Decide the action based on the computed probabilities
             if random.random() < prob_mask:
                 mask = create_mask(model, FLAGS.fraction_mask)
             else:
-                mask = create_adversarial_input(input, label, model)
+                mask = create_adversarial_input(sample, label, model)
 
             # Forward pass
-            output = model(input, mask)
+            output = model(sample, mask)
             loss = model.criterion(output, label)
             running_loss += loss.item()  # Accumulate loss for the batch
 
@@ -392,10 +391,10 @@ def test(model, X_test, y_test):
 
 
 def main():
-    '''
+    """"
     Train a neural network to guess the correct answer
     :return:
-    '''
+    """
     FLAGS = parse_arguments()
     #os.chdir(FLAGS.directory)
     model = MultimodalGuesser(FLAGS)

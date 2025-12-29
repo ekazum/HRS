@@ -54,7 +54,7 @@ def parse_embedder_guesser_args(parser, config):
     embedder_config = config.get("embedder_guesser", {})
     
     # Get the project path from the JSON configuration
-    project_path = Path(config.get("user_specific_project_path", os.getcwd()))
+    #project_path = Path(config.get("user_specific_project_path", os.getcwd()))
     
     # Add embedder/guesser specific arguments
     parser.add_argument("--hidden-dim1",

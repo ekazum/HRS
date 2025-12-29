@@ -16,6 +16,7 @@ dependencies:
   - scikit-learn=1.7.2
   - scipy=1.16.2
   - gymnasium
+  - pillow
   - pip
   - pip:
     - openai==2.9.0
@@ -26,4 +27,5 @@ dependencies:
     - stable-baselines3==2.8.0a2
     - torchvision==0.24.1
     - transformers==4.57.3
-    - ucimlrepo==0.0.7
+
+

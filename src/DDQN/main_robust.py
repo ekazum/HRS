@@ -81,9 +81,12 @@ def play_episode(env,
     Args:
         env (gym.Env): gym environment (CartPole-v0)
         agent (Agent): agent will train and get action
-        replay_memory (ReplayMemory): trajectory is saved here
+        priorityRM: (ReplayMemory): trajectory is saved here
         eps (float): 𝜺-greedy for exploration
         batch_size (int): batch size
+        gamma (float): discount rate of Q_target
+        train_guesser (bool): whether to train guesser in this episode
+        train_dqn (bool): whether to train dqn in this episode
     Returns:
         int: reward earned in this episode
     """

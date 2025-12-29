@@ -156,7 +156,7 @@ def TD3_agent():
     return model, env
 
 
-def test(env, model, agent) -> float:
+def test(env, model, agent) :
     """
        Evaluate the performance of a trained agent on a test set.
 
@@ -201,9 +201,9 @@ def test(env, model, agent) -> float:
 
         cost_list.append(sum_cost)
     # calculate auc score
-    C = confusion_matrix(env.y_test, y_hat_test)
-    print(C)
-    acc = np.sum(np.diag(C)) / len(env.y_test)
+    conf_mat = confusion_matrix(env.y_test, y_hat_test)
+    print(conf_mat)
+    acc = np.sum(np.diag(conf_mat)) / len(env.y_test)
     print(f"Test accuracy:{agent}", np.round(acc, 3))
     avg_cost = np.mean(cost_list)
     print('Average cost: {:1.3f}'.format(avg_cost))
