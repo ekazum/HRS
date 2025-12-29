@@ -17,28 +17,25 @@ class Agent(object):
     def __init__(self,
                  input_dim: int,
                  output_dim: int,
-                 hidden_dim: int, 
-                 lr: float, 
-                 weight_decay: float, 
                  FLAGS) -> None:
         """Agent class that choose action and train
         Args:
             input_dim (int): input dimension
             output_dim (int): output dimension
-            hidden_dim (int): hidden dimension
-            lr (float): learning rate
-            weight_decay (float): weight decay parameter
-            FLAGS: Configuration flags containing decay_step_size, lr_decay_factor, and min_lr
+            FLAGS: Configuration flags containing hidden_dim, lr, weight_decay, decay_step_size, lr_decay_factor, and min_lr
         """
+        # Extract and store only needed parameters from FLAGS
+        hidden_dim = FLAGS.hidden_dim
+        lr = FLAGS.lr
+        weight_decay = FLAGS.weight_decay
+        self.decay_step_size = FLAGS.decay_step_size
+        self.lr_decay_factor = FLAGS.lr_decay_factor
+        self.min_lr = FLAGS.min_lr
+        
         self.dqn = DQN(input_dim, output_dim, hidden_dim)
         self.target_dqn = DQN(input_dim, output_dim, hidden_dim)
         self.input_dim = input_dim
         self.output_dim = output_dim
-        
-        # Extract and store only needed parameters from FLAGS
-        self.decay_step_size = FLAGS.decay_step_size
-        self.lr_decay_factor = FLAGS.lr_decay_factor
-        self.min_lr = FLAGS.min_lr
         
         self.loss_fn = torch.nn.SmoothL1Loss()
         self.optim = torch.optim.Adam(self.dqn.parameters(),

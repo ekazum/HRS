@@ -153,9 +153,25 @@ class TestAgentStructure(unittest.TestCase):
         init_signature = init_match.group(0)
         self.assertIn('FLAGS', init_signature,
                      "Agent.__init__ should accept FLAGS parameter")
+        
+        # Check that hidden_dim, lr, weight_decay are NOT in signature
+        self.assertNotIn('hidden_dim:', init_signature,
+                        "Agent.__init__ should not have hidden_dim parameter")
+        self.assertNotIn('lr:', init_signature,
+                        "Agent.__init__ should not have lr parameter")
+        self.assertNotIn('weight_decay:', init_signature,
+                        "Agent.__init__ should not have weight_decay parameter")
     
-    def test_agent_extracts_parameters_from_flags(self):
-        """Test that Agent extracts and stores individual parameters from FLAGS."""
+    def test_agent_extracts_all_parameters_from_flags(self):
+        """Test that Agent extracts all needed parameters from FLAGS."""
+        # Check that hidden_dim, lr, weight_decay are extracted from FLAGS
+        self.assertIn('FLAGS.hidden_dim', self.content,
+                     "Agent should extract hidden_dim from FLAGS")
+        self.assertIn('FLAGS.lr', self.content,
+                     "Agent should extract lr from FLAGS")
+        self.assertIn('FLAGS.weight_decay', self.content,
+                     "Agent should extract weight_decay from FLAGS")
+        
         # Check that decay_step_size, lr_decay_factor, and min_lr are extracted
         self.assertIn('self.decay_step_size = FLAGS.decay_step_size', self.content,
                      "Agent should extract decay_step_size from FLAGS")
@@ -197,7 +213,7 @@ class TestMainRobustAgentCall(unittest.TestCase):
             self.content = f.read()
     
     def test_agent_instantiation_passes_flags(self):
-        """Test that Agent is instantiated with FLAGS parameter."""
+        """Test that Agent is instantiated with FLAGS parameter only."""
         # Find the Agent instantiation
         agent_pattern = r'agent\s*=\s*Agent\([^)]+\)'
         agent_match = re.search(agent_pattern, self.content, re.DOTALL)
@@ -205,10 +221,17 @@ class TestMainRobustAgentCall(unittest.TestCase):
         self.assertIsNotNone(agent_match, "Could not find Agent instantiation")
         
         agent_call = agent_match.group(0)
-        # Count the number of parameters (should be 6: state_dim, output_dim, hidden_dim, lr, weight_decay, FLAGS)
-        # The FLAGS parameter should be the last one
+        # Should pass only input_dim, output_dim, and FLAGS (3 parameters)
         self.assertIn('FLAGS', agent_call,
                      "Agent should be instantiated with FLAGS parameter")
+        
+        # Should NOT pass hidden_dim, lr, or weight_decay separately
+        self.assertNotIn('FLAGS.hidden_dim', agent_call,
+                        "Agent should not receive FLAGS.hidden_dim separately")
+        self.assertNotIn('FLAGS.lr', agent_call,
+                        "Agent should not receive FLAGS.lr separately")
+        self.assertNotIn('FLAGS.weight_decay', agent_call,
+                        "Agent should not receive FLAGS.weight_decay separately")
 
 
 if __name__ == '__main__':
