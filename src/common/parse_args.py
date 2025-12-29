@@ -150,6 +150,17 @@ def parse_main_robust_args(parser, config):
     project_path = Path(config.get("user_specific_project_path", os.getcwd()))
     
     # Add main_robust specific arguments
+    import torch
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    
+    parser.add_argument("--directory",
+                        type=str,
+                        default=str(project_path),
+                        help="Directory for saved models")
+    parser.add_argument("--device",
+                        type=str,
+                        default=str(device),
+                        help="Device for training")
 
     # Note: save_dir might conflict with embedder_guesser's save_dir
     # Since both use the same parameter name, we need to handle this carefully
