@@ -19,8 +19,8 @@ DEFAULT_FRACTION_MASK = 0
 DEFAULT_RUN_VALIDATION = 100
 
 # System defaults for main_robust/DDQN
-DEFAULT_SAVE_DIR = 'ddqn_robust_models'
-DEFAULT_SAVE_GUESSER_DIR = 'guesser_multi'
+DEFAULT_DDQN_SAVE_DIR = 'models\\ddqn_robust_models\\'
+DEFAULT_GUESSER_SAVE_DIR = 'models\\guesser\\'
 DEFAULT_GAMMA = 0.9
 DEFAULT_N_UPDATE_TARGET_DQN = 50
 DEFAULT_EP_PER_TRAINEE = 1000
@@ -57,10 +57,6 @@ def parse_embedder_guesser_args(parser, config):
     project_path = Path(config.get("user_specific_project_path", os.getcwd()))
     
     # Add embedder/guesser specific arguments
-    parser.add_argument("--directory",
-                        type=str,
-                        default=str(project_path),
-                        help="Directory for saved models")
     parser.add_argument("--hidden-dim1",
                         type=int,
                         default=embedder_config.get("hidden_dim1", DEFAULT_HIDDEN_DIM1),
@@ -111,8 +107,8 @@ def parse_embedder_guesser_args(parser, config):
                         help="Reduced dimension for text embedding")
     parser.add_argument("--save_dir",
                         type=str,
-                        default=embedder_config.get("save_dir", 'guesser_eICU'),
-                        help="save path for guesser models")
+                        default=embedder_config.get("save_dir", DEFAULT_GUESSER_SAVE_DIR),
+                        help="Directory for Guesser saved models")
     parser.add_argument(
         "--data",
         type=str,
@@ -146,24 +142,17 @@ def parse_main_robust_args(parser, config):
     project_path = Path(config.get("user_specific_project_path", os.getcwd()))
     
     # Add main_robust specific arguments
-    # Note: Some arguments like --directory are shared with embedder_guesser
-    # We only add them if they don't already exist
-    if not any(action.dest == 'directory' for action in parser._actions):
-        parser.add_argument("--directory",
-                            type=str,
-                            default=str(project_path),
-                            help="Directory for saved models")
-    
+
     # Note: save_dir might conflict with embedder_guesser's save_dir
     # Since both use the same parameter name, we need to handle this carefully
     # The embedder_guesser already set save_dir, so we'll use save_dir_ddqn for main_robust
     parser.add_argument("--save_dir_ddqn",
                         type=str,
-                        default=main_robust_config.get("save_dir", DEFAULT_SAVE_DIR),
+                        default=main_robust_config.get("save_dir_ddqn", DEFAULT_DDQN_SAVE_DIR),
                         help="Directory for saved DDQN models")
     parser.add_argument("--save_guesser_dir",
                         type=str,
-                        default=main_robust_config.get("save_guesser_dir", DEFAULT_SAVE_GUESSER_DIR),
+                        default=main_robust_config.get("save_guesser_dir", DEFAULT_GUESSER_SAVE_DIR),
                         help="Directory for saved guesser model")
     parser.add_argument("--gamma",
                         type=float,

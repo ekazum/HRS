@@ -227,6 +227,10 @@ def train_model(model, FLAGS,
         # Process each sample in the batch
         for i in random_indices:
             input = X_train[i]
+            #if isinstance(input, np.ndarray):
+            #    print(f"DEBUG train:aa sample {i} input.shape={input.shape}")
+            #else:
+            #    print(f"DEBUG train:bb sample {i} input.shape={getattr(input, 'shape', None)}")
             label = torch.tensor([y_train[i]], dtype=torch.long).to(model.device)  # Convert label to tensor
             prob_mask = compute_probabilities(j, nepochs)
             # Decide the action based on the computed probabilities
@@ -321,6 +325,10 @@ def val(model, X_val, y_val, best_val_auc=0):
     with torch.no_grad():
         for i in range(len(X_val)):
             input = X_val[i]
+            #if isinstance(input, np.ndarray):
+            #    print(f"DEBUG val:aa sample {i} input.shape={input.shape}")
+            #else:
+            #    print(f"DEBUG val:bb sample {i} input.shape={getattr(input, 'shape', None)}")
             label = torch.tensor(y_val[i], dtype=torch.long).to(model.device)
             output = model(input)
 
@@ -383,6 +391,13 @@ def test(model, X_test, y_test):
     with torch.no_grad():
         for i in range(len(X_test)):
             input = X_test[i]
+
+            # print shapes just before the call
+            if isinstance(input, np.ndarray):
+                print(f"DEBUG test:aa sample {i} input.shape={input.shape}")
+            else:
+                print(f"DEBUG test:bb sample {i} input.shape={getattr(input, 'shape', None)}")
+
             label = torch.tensor(y_test[i], dtype=torch.long).to(model.device)
             output = model(input)
 
@@ -423,7 +438,7 @@ def main():
     :return:
     '''
     FLAGS = parse_arguments()
-    os.chdir(FLAGS.directory)
+    #os.chdir(FLAGS.directory)
     model = MultimodalGuesser(FLAGS)
     model.to(model.device)
     X_train, X_test, y_train, y_test = train_test_split(model.X,
