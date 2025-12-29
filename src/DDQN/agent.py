@@ -17,7 +17,7 @@ class Agent(object):
     def __init__(self,
                  input_dim: int,
                  output_dim: int,
-                 hidden_dim: int, lr, weight_decay, FLAGS) -> None:
+                 hidden_dim: int, lr: float, weight_decay: float, FLAGS) -> None:
         """Agent class that choose action and train
         Args:
             input_dim (int): input dimension
