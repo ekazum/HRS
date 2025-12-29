@@ -9,6 +9,9 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from common.parse_args import parse_arguments
 
+# Hardcoded device detection
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 
 # ======== AGENT DEFINITIONS ========
 
@@ -20,7 +23,7 @@ def PPO_agent():
         model: Trained PPO model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS)
+    env = myEnv(flags=FLAGS, device=DEVICE)
     model = PPO("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
@@ -37,7 +40,7 @@ def DQN_agent():
         model: Trained DQN model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS)
+    env = myEnv(flags=FLAGS, device=DEVICE)
     model = DQN("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
@@ -51,7 +54,7 @@ def A2C_agent():
         model: Trained A2C model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS)
+    env = myEnv(flags=FLAGS, device=DEVICE)
     model = A2C("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
@@ -65,7 +68,7 @@ def TD3_agent():
         model: Trained TD3 model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS)
+    env = myEnv(flags=FLAGS, device=DEVICE)
     model = TD3("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
