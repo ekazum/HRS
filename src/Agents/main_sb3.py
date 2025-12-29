@@ -14,14 +14,16 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # ======== AGENT DEFINITIONS ========
 
 
-def PPO_agent():
+def PPO_agent(flags):
     """
     Create and train a PPO agent in the custom environment.
+    Args:
+        flags: Configuration flags
     Returns:
         model: Trained PPO model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS, device=DEVICE)
+    env = myEnv(flags=flags, device=DEVICE)
     model = PPO("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
@@ -31,42 +33,48 @@ def PPO_agent():
 
 
 # Define agent for DQN
-def DQN_agent():
+def DQN_agent(flags):
     """
     Create and train a DQN agent in the custom environment.
+    Args:
+        flags: Configuration flags
     Returns:
         model: Trained DQN model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS, device=DEVICE)
+    env = myEnv(flags=flags, device=DEVICE)
     model = DQN("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
 
 
 # Define agent for A2C
-def A2C_agent():
+def A2C_agent(flags):
     """
     Create and train an A2C agent in the custom environment.
+    Args:
+        flags: Configuration flags
     Returns:
         model: Trained A2C model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS, device=DEVICE)
+    env = myEnv(flags=flags, device=DEVICE)
     model = A2C("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
 
 
 # Define agent for TD3
-def TD3_agent():
+def TD3_agent(flags):
     """
     Create and train a TD3 agent in the custom environment.
+    Args:
+        flags: Configuration flags
     Returns:
         model: Trained TD3 model
         env: The training environment
     """
-    env = myEnv(flags=FLAGS, device=DEVICE)
+    env = myEnv(flags=flags, device=DEVICE)
     model = TD3("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     return model, env
@@ -126,15 +134,14 @@ def test(env, model, agent) :
 
 
 def main():
-    global FLAGS
     FLAGS = parse_arguments()
-    model, env = PPO_agent()
+    model, env = PPO_agent(FLAGS)
     test(env, model, 'PPO')
-    model, env = DQN_agent()
+    model, env = DQN_agent(FLAGS)
     test(env, model, 'DQN')
-    model, env = A2C_agent()
+    model, env = A2C_agent(FLAGS)
     test(env, model, 'A2C')
-    model, env = TD3_agent()
+    model, env = TD3_agent(FLAGS)
     test(env, model, 'TD3')
 
 
