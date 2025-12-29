@@ -198,7 +198,6 @@ def load_networks(i_episode: int, save_dir: str, FLAGS, state_dim=26, output_dim
     else:
         # Use load_temp_model for temporary guesser
         guesser.load_temp_model(i_episode, val_acc)
-    guesser.to(device=DEVICE)
 
     # load sqn
     dqn = DQN(state_dim, output_dim, hidden_dim)

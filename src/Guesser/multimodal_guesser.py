@@ -388,6 +388,7 @@ class MultimodalGuesser(nn.Module):
         if os.path.exists(guesser_load_path):
             guesser_state_dict = torch.load(guesser_load_path, map_location=self.device, weights_only=True)
             self.load_state_dict(guesser_state_dict)
+            self.to(self.device)
 
     def save_temp_guesser(self, episode, accuracy):
         """
@@ -438,3 +439,4 @@ class MultimodalGuesser(nn.Module):
         if os.path.exists(guesser_load_path):
             guesser_state_dict = torch.load(guesser_load_path, map_location=self.device, weights_only=True)
             self.load_state_dict(guesser_state_dict)
+            self.to(self.device)
