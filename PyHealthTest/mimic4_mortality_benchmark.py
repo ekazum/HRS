@@ -15,6 +15,7 @@ from pyhealth.tasks import mortality_prediction_mimic4_fn
 from pyhealth.datasets import split_by_patient
 from pyhealth.models import Transformer
 from pyhealth.trainer import Trainer
+import torch
 
 
 def main():
@@ -83,10 +84,13 @@ def main():
         
         print("Model initialized successfully")
         
+        # Determine device (GPU if available, otherwise CPU)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        
         # Initialize trainer
         trainer = Trainer(
             model=model,
-            device="cuda" if __import__("torch").cuda.is_available() else "cpu",
+            device=device,
         )
         
         print(f"Trainer initialized (device: {trainer.device})")
