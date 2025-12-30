@@ -14,6 +14,9 @@ The benchmark demonstrates the complete workflow for healthcare predictive model
 ## Files
 
 - `mimic4_mortality_benchmark.py`: Main script implementing the benchmark workflow
+- `demo_workflow.py`: Demo script showing the expected workflow without requiring actual data
+- `__init__.py`: Package initialization file
+- `README.md`: This documentation file
 
 ## Requirements
 
@@ -39,6 +42,19 @@ The script expects the following tables:
 - `prescriptions`: Medication prescriptions
 
 ## Usage
+
+### Quick Demo (No Data Required)
+
+To see the expected workflow and structure without actual MIMIC-IV data:
+
+```bash
+cd PyHealthTest
+python demo_workflow.py
+```
+
+This will display the complete workflow with code snippets and expected outputs.
+
+### Running the Full Benchmark
 
 Once you have set up the MIMIC-IV data:
 
