@@ -93,7 +93,8 @@ def sample_csv_file(input_path, output_dir, sample_size=2000):
         
         # Read only the first N rows to avoid memory issues
         # pandas automatically handles .gz compression
-        df = pd.read_csv(input_path, nrows=sample_size)
+        # low_memory=False ensures consistent dtype inference across chunks
+        df = pd.read_csv(input_path, nrows=sample_size, low_memory=False)
         
         print(f"   Loaded {len(df)} rows × {len(df.columns)} columns")
         
